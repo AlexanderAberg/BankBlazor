@@ -7,7 +7,61 @@
         <img src="/images/hero.jpg" class="hero-img">
         <div class="hero-overlay">
             <h2>Hello Admin!</h2>
-            <p>The next Scottish bank holiday is <strong>{holiday}</strong> on <strong>{date}</strong>.</p>
+            <p>The next Scottish bank holiday is <strong>@holiday</strong> on <strong>@date</strong>.</p>
         </div>
     </div>
 </section>
+
+@code {
+    private string holiday = "Loading...";
+    private string date = "Loading...";
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            using var httpClient = new HttpClient();
+            var response = await httpClient.GetFromJsonAsync<BankHolidaysResponse>("https://www.gov.uk/bank-holidays.json");
+
+            if (response != null && response.Scotland?.Events?.Count > 0)
+            {
+                var nextHoliday = response.Scotland.Events
+                    .Where(e => e.Date > DateTime.Today)
+                    .OrderBy(e => e.Date)
+                    .FirstOrDefault();
+
+                if (nextHoliday != null)
+                {
+                    holiday = nextHoliday.Title;
+                    date = nextHoliday.Date.ToString("dd/MM/yyyy");
+                }
+                else
+                {
+                    holiday = "No upcoming holidays";
+                    date = "";
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            holiday = "Error loading holiday";
+            date = ex.Message;
+        }
+    }
+
+    private class BankHolidaysResponse
+    {
+        public RegionData Scotland { get; set; }
+
+        public class RegionData
+        {
+            public List<HolidayEvent> Events { get; set; }
+        }
+
+        public class HolidayEvent
+        {
+            public string Title { get; set; }
+            public DateTime Date { get; set; }
+        }
+    }
+}
