@@ -12,14 +12,67 @@
                 <p><strong>Balance:</strong> $5,000</p>
             </div>
             <div class="actions">
-                <button>Deposit</button>
+                <button @onclick="ShowDepositInput">Deposit</button>
                 <button>Withdraw</button>
                 <button>Transfer</button>
             </div>
+            @if (isDepositInputVisible)
+            {
+                <div class="deposit-input">
+                    <input type="number" @bind="depositAmount" placeholder="Enter amount to deposit" />
+                    <button @onclick="ConfirmDeposit">Submit</button>
+                    <button @onclick="CancelDeposit">Cancel</button>
+                </div>
+            }
         </div>
     </div>
 </section>
 
-@code {
+@if (isConfirmationVisible)
+{
+    <div class="modal-overlay">
+        <div class="modal">
+            <h3>Confirm Deposit</h3>
+            <p>Are you sure you want to deposit $@depositAmount?</p>
+            <button @onclick="AcceptDeposit">Yes</button>
+            <button @onclick="CancelConfirmation">No</button>
+        </div>
+    </div>
+}
 
+@code {
+    private bool isDepositInputVisible = false;
+    private bool isConfirmationVisible = false;
+    private decimal depositAmount;
+
+    private void ShowDepositInput()
+    {
+        isDepositInputVisible = true;
+    }
+
+    private void ConfirmDeposit()
+    {
+        Console.WriteLine($"Deposit amount entered: {depositAmount}");
+        isConfirmationVisible = true;
+        StateHasChanged();
+    }
+
+    private void AcceptDeposit()
+    {
+        Console.WriteLine($"Deposited: {depositAmount}");
+        isConfirmationVisible = false;
+        isDepositInputVisible = false;
+        depositAmount = 0;
+    }
+
+    private void CancelDeposit()
+    {
+        isDepositInputVisible = false;
+        depositAmount = 0;
+    }
+
+    private void CancelConfirmation()
+    {
+        isConfirmationVisible = false;
+    }
 }
