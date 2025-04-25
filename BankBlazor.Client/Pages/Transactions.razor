@@ -24,21 +24,22 @@
                     <button @onclick="CancelDeposit">Cancel</button>
                 </div>
             }
+            @if (isConfirmationVisible)
+            {
+                <div class="transaction-modal-overlay">
+                    <div class="transaction-modal">
+                        <h3>Confirm Deposit</h3>
+                        <p>Are you sure you want to deposit $@depositAmount?</p>
+                        <button @onclick="AcceptDeposit">Yes</button>
+                        <button @onclick="CancelConfirmation">No</button>
+                    </div>
+                </div>
+            }
         </div>
     </div>
 </section>
 
-@if (isConfirmationVisible)
-{
-    <div class="modal-overlay">
-        <div class="modal">
-            <h3>Confirm Deposit</h3>
-            <p>Are you sure you want to deposit $@depositAmount?</p>
-            <button @onclick="AcceptDeposit">Yes</button>
-            <button @onclick="CancelConfirmation">No</button>
-        </div>
-    </div>
-}
+
 
 @code {
     private bool isDepositInputVisible = false;
