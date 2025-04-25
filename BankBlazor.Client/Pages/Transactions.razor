@@ -13,24 +13,45 @@
             </div>
             <div class="actions">
                 <button @onclick="ShowDepositInput">Deposit</button>
-                <button>Withdraw</button>
-                <button>Transfer</button>
+                <button @onclick="ShowWithdrawInput">Withdraw</button>
+                <button @onclick="ShowTransferInput">Transfer</button>
             </div>
+
             @if (isDepositInputVisible)
             {
-                <div class="deposit-input">
-                    <input type="number" @bind="depositAmount" placeholder="Enter amount to deposit" />
+                <div class="transaction-input">
+                    <input type="number" @bind="transactionAmount" placeholder="Enter amount to deposit" />
                     <button @onclick="ConfirmDeposit">Submit</button>
-                    <button @onclick="CancelDeposit">Cancel</button>
+                    <button @onclick="CancelTransaction">Cancel</button>
                 </div>
             }
+
+            @if (isWithdrawInputVisible)
+            {
+                <div class="transaction-input">
+                    <input type="number" @bind="transactionAmount" placeholder="Enter amount to withdraw" />
+                    <button @onclick="ConfirmWithdraw">Submit</button>
+                    <button @onclick="CancelTransaction">Cancel</button>
+                </div>
+            }
+
+            @if (isTransferInputVisible)
+            {
+                <div class="transaction-input">
+                    <input type="number" @bind="transactionAmount" placeholder="Enter amount to transfer" />
+                    <input type="text" @bind="transferRecipient" placeholder="Enter recipient account number" />
+                    <button @onclick="ConfirmTransfer">Submit</button>
+                    <button @onclick="CancelTransaction">Cancel</button>
+                </div>
+            }
+
             @if (isConfirmationVisible)
             {
                 <div class="transaction-modal-overlay">
                     <div class="transaction-modal">
-                        <h3>Confirm Deposit</h3>
-                        <p>Are you sure you want to deposit $@depositAmount?</p>
-                        <button @onclick="AcceptDeposit">Yes</button>
+                        <h3>@confirmationTitle</h3>
+                        <p>@confirmationMessage</p>
+                        <button @onclick="AcceptTransaction">Yes</button>
                         <button @onclick="CancelConfirmation">No</button>
                     </div>
                 </div>
@@ -39,41 +60,83 @@
     </div>
 </section>
 
-
-
 @code {
     private bool isDepositInputVisible = false;
+    private bool isWithdrawInputVisible = false;
+    private bool isTransferInputVisible = false;
     private bool isConfirmationVisible = false;
-    private decimal depositAmount;
+
+    private decimal transactionAmount;
+    private string transferRecipient = string.Empty;
+    private string confirmationTitle = string.Empty;
+    private string confirmationMessage = string.Empty;
 
     private void ShowDepositInput()
     {
+        ResetInputs();
         isDepositInputVisible = true;
+    }
+
+    private void ShowWithdrawInput()
+    {
+        ResetInputs();
+        isWithdrawInputVisible = true;
+    }
+
+    private void ShowTransferInput()
+    {
+        ResetInputs();
+        isTransferInputVisible = true;
     }
 
     private void ConfirmDeposit()
     {
-        Console.WriteLine($"Deposit amount entered: {depositAmount}");
+        confirmationTitle = "Confirm Deposit";
+        confirmationMessage = $"Are you sure you want to deposit ${transactionAmount}?";
         isConfirmationVisible = true;
-        StateHasChanged();
     }
 
-    private void AcceptDeposit()
+    private void ConfirmWithdraw()
     {
-        Console.WriteLine($"Deposited: {depositAmount}");
-        isConfirmationVisible = false;
-        isDepositInputVisible = false;
-        depositAmount = 0;
+        confirmationTitle = "Confirm Withdraw";
+        confirmationMessage = $"Are you sure you want to withdraw ${transactionAmount}?";
+        isConfirmationVisible = true;
     }
 
-    private void CancelDeposit()
+    private void ConfirmTransfer()
     {
-        isDepositInputVisible = false;
-        depositAmount = 0;
+        confirmationTitle = "Confirm Transfer";
+        confirmationMessage = $"Are you sure you want to transfer ${transactionAmount} to account {transferRecipient}?";
+        isConfirmationVisible = true;
+    }
+
+    private void AcceptTransaction()
+    {
+        Console.WriteLine($"{confirmationTitle}: ${transactionAmount}");
+        if (isTransferInputVisible)
+        {
+            Console.WriteLine($"Transfer recipient: {transferRecipient}");
+        }
+        ResetInputs();
+    }
+
+    private void CancelTransaction()
+    {
+        ResetInputs();
     }
 
     private void CancelConfirmation()
     {
         isConfirmationVisible = false;
+    }
+
+    private void ResetInputs()
+    {
+        isDepositInputVisible = false;
+        isWithdrawInputVisible = false;
+        isTransferInputVisible = false;
+        isConfirmationVisible = false;
+        transactionAmount = 0;
+        transferRecipient = string.Empty;
     }
 }
