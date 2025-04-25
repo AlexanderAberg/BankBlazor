@@ -216,7 +216,14 @@ hero-img {
 }
 
 
+.transaction-input {
+    margin-top: 10px;
+}
 
+.transaction-input input {
+    margin-right: 5px;
+    padding: 5px;
+}
 
 .transaction-modal-overlay {
     position: fixed;
