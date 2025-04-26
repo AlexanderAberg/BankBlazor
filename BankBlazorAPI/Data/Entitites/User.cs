@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace BankBlazor.Client.Data.Models;
+namespace BankBlazorAPI.Data.Entitites;
 
 public partial class User
 {
