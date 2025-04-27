@@ -1,4 +1,5 @@
 ﻿@page "/transactions"
+@using BankBlazorAPI.Data.Entities
 
 <PageTitle>Transactions</PageTitle>
 
@@ -7,9 +8,18 @@
         <img src="/images/hero.jpg" class="hero-img">
         <div class="hero-overlay">
             <h2>Account Transactions</h2>
+            <div class="account-selection">
+                <label for="accountSelect">Select Account:</label>
+                <select id="accountSelect" @bind="selectedAccountId" @bind:after="LoadAccountInfo">
+                    @foreach (var account in accounts)
+                    {
+                        <option value="@account.Id">@account.Name</option>
+                    }
+                </select>
+            </div>
             <div class="info">
-                <p><strong>Account Number:</strong> 123456789</p>
-                <p><strong>Balance:</strong> $5,000</p>
+                <p><strong>Account Number:</strong> @currentAccount?.Number</p>
+                <p><strong>Balance:</strong> @currentAccount?.Balance.ToString("C")</p>
             </div>
             <div class="actions">
                 <button @onclick="ShowDepositInput">Deposit</button>
@@ -61,6 +71,16 @@
 </section>
 
 @code {
+    [Inject] private HttpClient Http { get; set; } = default!;
+
+    private List<BankBlazorAPI.Data.Entities.Account> accounts = new();
+    private BankBlazorAPI.Data.Entities.Account? currentAccount;
+    private int selectedAccountId;
+
+    private List<Account> accounts = new();
+    private Account? currentAccount;
+    private int selectedAccountId;
+
     private bool isDepositInputVisible = false;
     private bool isWithdrawInputVisible = false;
     private bool isTransferInputVisible = false;
@@ -70,6 +90,23 @@
     private string transferRecipient = string.Empty;
     private string confirmationTitle = string.Empty;
     private string confirmationMessage = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        
+        accounts = await FetchAccountsFromDatabase();
+        if (accounts.Any())
+        {
+            selectedAccountId = accounts.First().Id;
+            await LoadAccountInfo();
+        }
+    }
+
+    private async Task LoadAccountInfo()
+    {
+        // Simulate fetching account details from the database
+        currentAccount = await FetchAccountDetailsFromDatabase(selectedAccountId);
+    }
 
     private void ShowDepositInput()
     {
@@ -138,5 +175,35 @@
         isConfirmationVisible = false;
         transactionAmount = 0;
         transferRecipient = string.Empty;
+    }
+
+    private async Task<List<Account>> FetchAccountsFromDatabase()
+    {
+        try
+        {
+            // Use HttpClient to fetch accounts from the API
+            var response = await Http.GetFromJsonAsync<List<Account>>("api/accounts");
+            return response ?? new List<Account>();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching accounts: {ex.Message}");
+            return new List<Account>();
+        }
+    }
+
+    private async Task<Account> FetchAccountDetailsFromDatabase(int accountId)
+    {
+        try
+        {
+            // Use HttpClient to fetch account details from the API
+            var response = await Http.GetFromJsonAsync<Account>($"api/accounts/{accountId}");
+            return response ?? new Account();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching account details: {ex.Message}");
+            return new Account();
+        }
     }
 }
