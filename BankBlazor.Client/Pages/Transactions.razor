@@ -1,5 +1,6 @@
 ﻿@page "/transactions"
-@using BankBlazorAPI.Data.Entities
+@using BankBlazor.Client.ViewModels
+@inject AccountListViewModel AccountListViewModel
 
 <PageTitle>Transactions</PageTitle>
 
@@ -10,16 +11,16 @@
             <h2>Account Transactions</h2>
             <div class="account-selection">
                 <label for="accountSelect">Select Account:</label>
-                <select id="accountSelect" @bind="selectedAccountId" @bind:after="LoadAccountInfo">
-                    @foreach (var account in accounts)
+                <select id="accountSelect" @bind="AccountListViewModel.SelectedAccountId" @bind:after="LoadAccountInfo">
+                    @foreach (var account in AccountListViewModel.Accounts)
                     {
-                        <option value="@account.Id">@account.Name</option>
+                        <option value="@account.AccountId">@account.Frequency</option>
                     }
                 </select>
             </div>
             <div class="info">
-                <p><strong>Account Number:</strong> @currentAccount?.Number</p>
-                <p><strong>Balance:</strong> @currentAccount?.Balance.ToString("C")</p>
+                <p><strong>Account Number:</strong> @AccountListViewModel.CurrentAccount?.AccountId</p>
+                <p><strong>Balance:</strong> @AccountListViewModel.CurrentAccount?.Balance.ToString("C")</p>
             </div>
             <div class="actions">
                 <button @onclick="ShowDepositInput">Deposit</button>
@@ -71,16 +72,6 @@
 </section>
 
 @code {
-    [Inject] private HttpClient Http { get; set; } = default!;
-
-    private List<BankBlazorAPI.Data.Entities.Account> accounts = new();
-    private BankBlazorAPI.Data.Entities.Account? currentAccount;
-    private int selectedAccountId;
-
-    private List<Account> accounts = new();
-    private Account? currentAccount;
-    private int selectedAccountId;
-
     private bool isDepositInputVisible = false;
     private bool isWithdrawInputVisible = false;
     private bool isTransferInputVisible = false;
@@ -93,20 +84,34 @@
 
     protected override async Task OnInitializedAsync()
     {
-        
-        accounts = await FetchAccountsFromDatabase();
-        if (accounts.Any())
+        try
         {
-            selectedAccountId = accounts.First().Id;
-            await LoadAccountInfo();
+            await AccountListViewModel.LoadAccountsAsync();
+            if (AccountListViewModel.Accounts.Any())
+            {
+                AccountListViewModel.SelectedAccountId = AccountListViewModel.Accounts.First().AccountId;
+                await LoadAccountInfo();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error initializing transactions: {ex.Message}");
         }
     }
 
+
     private async Task LoadAccountInfo()
     {
-        // Simulate fetching account details from the database
-        currentAccount = await FetchAccountDetailsFromDatabase(selectedAccountId);
+        try
+        {
+            await AccountListViewModel.LoadAccountDetailsAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading account info: {ex.Message}");
+        }
     }
+
 
     private void ShowDepositInput()
     {
@@ -147,15 +152,38 @@
         isConfirmationVisible = true;
     }
 
-    private void AcceptTransaction()
+    private async Task AcceptTransaction()
     {
-        Console.WriteLine($"{confirmationTitle}: ${transactionAmount}");
-        if (isTransferInputVisible)
+        try
         {
-            Console.WriteLine($"Transfer recipient: {transferRecipient}");
+            if (isDepositInputVisible)
+            {
+                await AccountListViewModel.DepositAsync(transactionAmount);
+            }
+            else if (isWithdrawInputVisible)
+            {
+                await AccountListViewModel.WithdrawAsync(transactionAmount);
+            }
+            else if (isTransferInputVisible)
+            {
+                if (string.IsNullOrWhiteSpace(transferRecipient))
+                {
+                    Console.WriteLine("Transfer recipient is required.");
+                    return;
+                }
+
+                await AccountListViewModel.TransferAsync(transactionAmount, transferRecipient);
+            }
+
+            Console.WriteLine($"{confirmationTitle}: ${transactionAmount}");
+            ResetInputs();
         }
-        ResetInputs();
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error processing transaction: {ex.Message}");
+        }
     }
+
 
     private void CancelTransaction()
     {
@@ -176,34 +204,5 @@
         transactionAmount = 0;
         transferRecipient = string.Empty;
     }
-
-    private async Task<List<Account>> FetchAccountsFromDatabase()
-    {
-        try
-        {
-            // Use HttpClient to fetch accounts from the API
-            var response = await Http.GetFromJsonAsync<List<Account>>("api/accounts");
-            return response ?? new List<Account>();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error fetching accounts: {ex.Message}");
-            return new List<Account>();
-        }
-    }
-
-    private async Task<Account> FetchAccountDetailsFromDatabase(int accountId)
-    {
-        try
-        {
-            // Use HttpClient to fetch account details from the API
-            var response = await Http.GetFromJsonAsync<Account>($"api/accounts/{accountId}");
-            return response ?? new Account();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error fetching account details: {ex.Message}");
-            return new Account();
-        }
-    }
 }
+
