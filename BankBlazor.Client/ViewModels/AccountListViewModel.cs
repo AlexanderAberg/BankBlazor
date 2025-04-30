@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using System.Threading.Tasks;
 using System.Net.Http;
 using System.Net.Http.Json;
+using System.Threading.Tasks;
 
 namespace BankBlazor.Client.ViewModels
 {
@@ -14,18 +14,18 @@ namespace BankBlazor.Client.ViewModels
             _httpClient = httpClient;
         }
 
-        public List<AccountListViewModel> Accounts { get; set; } = new();
-        public AccountListViewModel? CurrentAccount { get; set; }
+        public List<AccountDTO> Accounts { get; set; } = new();
+        public AccountDTO? CurrentAccount { get; set; }
         public int SelectedAccountId { get; set; }
 
         public async Task LoadAccountsAsync()
         {
-            Accounts = await _httpClient.GetFromJsonAsync<List<AccountListViewModel>>("api/accounts") ?? new List<AccountListViewModel>();
+            Accounts = await _httpClient.GetFromJsonAsync<List<AccountDTO>>("api/accounts") ?? new List<AccountDTO>();
         }
 
         public async Task LoadAccountDetailsAsync()
         {
-            CurrentAccount = await _httpClient.GetFromJsonAsync<AccountListViewModel>($"api/accounts/{SelectedAccountId}");
+            CurrentAccount = await _httpClient.GetFromJsonAsync<AccountDTO>($"api/accounts/{SelectedAccountId}");
         }
 
         public async Task DepositAsync(decimal amount)
@@ -39,11 +39,8 @@ namespace BankBlazor.Client.ViewModels
         public async Task TransferAsync(decimal amount, string recipientAccountNumber)
         {
         }
-
-        public int AccountId { get; set; }
-        public string Frequency { get; set; } = string.Empty;
-        public DateOnly Created { get; set; }
-        public decimal Balance { get; set; }
     }
 }
+
+
 

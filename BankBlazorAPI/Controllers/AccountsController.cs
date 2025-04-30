@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using BankBlazorAPI.Data.Entitites;
 using BankBlazor.Api.Data.Contexts;
+using BankBlazorAPI.DTOs;
 
 namespace BankBlazorAPI.Controllers
 {
@@ -16,10 +17,10 @@ namespace BankBlazorAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<AccountDto>>> GetAccounts()
+        public async Task<ActionResult<IEnumerable<AccountDTO>>> GetAccounts()
         {
             var accounts = await _context.Accounts
-                .Select(a => new AccountDto
+                .Select(a => new AccountDTO
                 {
                     AccountId = a.AccountId,
                     Frequency = a.Frequency,
@@ -31,11 +32,11 @@ namespace BankBlazorAPI.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<AccountDto>> GetAccount(int id)
+        public async Task<ActionResult<AccountDTO>> GetAccount(int id)
         {
             var account = await _context.Accounts
                 .Where(a => a.AccountId == id)
-                .Select(a => new AccountDto
+                .Select(a => new AccountDTO
                 {
                     AccountId = a.AccountId,
                     Frequency = a.Frequency,
