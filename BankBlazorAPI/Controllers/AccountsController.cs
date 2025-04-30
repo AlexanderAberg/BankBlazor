@@ -2,6 +2,7 @@
 using BankBlazorAPI.Data.Entitites;
 using BankBlazor.Api.Data.Contexts;
 using BankBlazorAPI.DTOs;
+using Microsoft.EntityFrameworkCore;
 
 namespace BankBlazorAPI.Controllers
 {
