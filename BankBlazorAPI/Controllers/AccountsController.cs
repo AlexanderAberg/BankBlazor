@@ -52,6 +52,58 @@ namespace BankBlazorAPI.Controllers
 
             return Ok(account);
         }
+
+        [HttpPost("deposit")]
+        public async Task<IActionResult> Deposit([FromBody] TransactionDTO request)
+        {
+            var account = await _context.Accounts.FindAsync(request.AccountId);
+            if (account == null)
+            {
+                return NotFound("Account not found.");
+            }
+
+            account.Balance += request.Amount;
+
+            await _context.SaveChangesAsync();
+
+            return Ok("Deposit successful.");
+        }
+
+        [HttpPost("withdraw")]
+        public async Task<IActionResult> Withdraw([FromBody] TransactionDTO request)
+        {
+            var account = await _context.Accounts.FindAsync(request.AccountId);
+            if (account == null)
+            {
+                return NotFound("Account not found.");
+            }
+            if (account.Balance < request.Amount)
+            {
+                return BadRequest("Insufficient funds.");
+            }
+            account.Balance -= request.Amount;
+            await _context.SaveChangesAsync();
+            return Ok("Withdrawal successful.");
+        }
+
+        [HttpPost("transfer")]
+        public async Task<IActionResult> Transfer([FromBody] TransferDTO request)
+        {
+            var fromAccount = await _context.Accounts.FindAsync(request.FromAccountId);
+            var toAccount = await _context.Accounts.FindAsync(request.ToAccountId);
+            if (fromAccount == null || toAccount == null)
+            {
+                return NotFound("One or both accounts not found.");
+            }
+            if (fromAccount.Balance < request.Amount)
+            {
+                return BadRequest("Insufficient funds.");
+            }
+            fromAccount.Balance -= request.Amount;
+            toAccount.Balance += request.Amount;
+            await _context.SaveChangesAsync();
+            return Ok("Transfer successful.");
+        }
     }
 }
    

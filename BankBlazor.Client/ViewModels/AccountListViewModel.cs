@@ -44,14 +44,66 @@ namespace BankBlazor.Client.ViewModels
 
         public async Task DepositAsync(decimal amount)
         {
+            try
+            {
+                var response = await _httpClient.PostAsJsonAsync("api/accounts/deposit", new { AccountId = SelectedAccountId, Amount = amount });
+                if (response.IsSuccessStatusCode)
+                {
+                    Console.WriteLine("Deposit successful.");
+                    await LoadAccountDetailsAsync(); 
+                }
+                else
+                {
+                    Console.WriteLine($"Deposit failed: {response.ReasonPhrase}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error during deposit: {ex.Message}");
+            }
         }
+
 
         public async Task WithdrawAsync(decimal amount)
         {
+            try
+            {
+                var response = await _httpClient.PostAsJsonAsync("api/accounts/withdraw", new { AccountId = SelectedAccountId, Amount = amount });
+                if (response.IsSuccessStatusCode)
+                {
+                    Console.WriteLine("Withdrawal successful.");
+                    await LoadAccountDetailsAsync();
+                }
+                else
+                {
+                    Console.WriteLine($"Withdrawal failed: {response.ReasonPhrase}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error during withdrawal: {ex.Message}");
+            }
         }
 
         public async Task TransferAsync(decimal amount, string recipientAccountNumber)
         {
+            try
+            {
+                var response = await _httpClient.PostAsJsonAsync("api/accounts/transfer", new { AccountId = SelectedAccountId, Amount = amount, RecipientAccountNumber = recipientAccountNumber });
+                if (response.IsSuccessStatusCode)
+                {
+                    Console.WriteLine("Transfer successful.");
+                    await LoadAccountDetailsAsync();
+                }
+                else
+                {
+                    Console.WriteLine($"Transfer failed: {response.ReasonPhrase}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error during transfer: {ex.Message}");
+            }
         }
     }
 }
