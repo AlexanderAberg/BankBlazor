@@ -87,21 +87,33 @@ namespace BankBlazorAPI.Controllers
         }
 
         [HttpPost("transfer")]
-        public async Task<IActionResult> Transfer([FromBody] TransferDTO request)
+        public async Task<IActionResult> Transfer([FromBody] TransferDTO transferRequest)
         {
-            var fromAccount = await _context.Accounts.FindAsync(request.FromAccountId);
-            var toAccount = await _context.Accounts.FindAsync(request.ToAccountId);
-            if (fromAccount == null || toAccount == null)
+            Console.WriteLine($"Transfer request received: SourceAccountId={transferRequest.AccountId}, Amount={transferRequest.Amount}, RecipientAccountNumber={transferRequest.RecipientAccountNumber}");
+
+            var sourceAccount = await _context.Accounts.FindAsync(transferRequest.AccountId);
+            if (sourceAccount == null)
             {
-                return NotFound("One or both accounts not found.");
+                return NotFound("Source account not found.");
             }
-            if (fromAccount.Balance < request.Amount)
+
+            var recipientAccount = await _context.Accounts
+                .FirstOrDefaultAsync(a => a.AccountId.ToString() == transferRequest.RecipientAccountNumber);
+            if (recipientAccount == null)
             {
-                return BadRequest("Insufficient funds.");
+                return NotFound("Recipient account not found.");
             }
-            fromAccount.Balance -= request.Amount;
-            toAccount.Balance += request.Amount;
+
+            if (sourceAccount.Balance < transferRequest.Amount)
+            {
+                return BadRequest("Insufficient balance in the source account.");
+            }
+
+            sourceAccount.Balance -= transferRequest.Amount;
+            recipientAccount.Balance += transferRequest.Amount;
+
             await _context.SaveChangesAsync();
+
             return Ok("Transfer successful.");
         }
     }

@@ -1,4 +1,4 @@
-﻿namespace BankBlazorAPI.DTOs
+﻿namespace BankBlazor.Client.DTOs
 {
     public class TransferDTO
     {
@@ -7,4 +7,3 @@
         public string RecipientAccountNumber { get; set; } = string.Empty;
     }
 }
-

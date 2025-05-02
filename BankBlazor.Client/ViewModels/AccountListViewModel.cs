@@ -89,11 +89,17 @@ namespace BankBlazor.Client.ViewModels
         {
             try
             {
-                var response = await _httpClient.PostAsJsonAsync("api/accounts/transfer", new { AccountId = SelectedAccountId, Amount = amount, RecipientAccountNumber = recipientAccountNumber });
+                var response = await _httpClient.PostAsJsonAsync("api/accounts/transfer", new TransferDTO
+                {
+                    AccountId = SelectedAccountId,
+                    Amount = amount,
+                    RecipientAccountNumber = recipientAccountNumber
+                });
+
                 if (response.IsSuccessStatusCode)
                 {
                     Console.WriteLine("Transfer successful.");
-                    await LoadAccountDetailsAsync();
+                    await LoadAccountDetailsAsync(); 
                 }
                 else
                 {
