@@ -8,6 +8,16 @@ var connectionString = builder.Configuration.GetConnectionString("BankAppData");
 builder.Services.AddDbContext<BankAppDataContext>(options =>
     options.UseSqlServer(connectionString));
 
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.WithOrigins("https://localhost:7249")
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
+
 builder.Services.AddControllers();
 
 builder.Services.AddSwaggerGen();
@@ -20,6 +30,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseCors();
+
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
@@ -27,3 +39,4 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+

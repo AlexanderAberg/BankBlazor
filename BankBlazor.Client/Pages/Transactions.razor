@@ -14,9 +14,10 @@
                 <select id="accountSelect" @bind="AccountListViewModel.SelectedAccountId" @bind:after="LoadAccountInfo">
                     @foreach (var account in AccountListViewModel.Accounts)
                     {
-                        <option value="@account.AccountId">@account.Frequency</option>
+                        <option value="@account.AccountId">Account #@account.AccountId (Frequency: @account.Frequency)</option>
                     }
                 </select>
+
             </div>
             <div class="info">
                 <p><strong>Account Number:</strong> @AccountListViewModel.CurrentAccount?.AccountId</p>
@@ -98,6 +99,21 @@
             Console.WriteLine($"Error initializing transactions: {ex.Message}");
         }
     }
+
+    public async Task LoadAccountsAsync()
+    {
+        try
+        {
+            Console.WriteLine("Attempting to load accounts from API...");
+            await AccountListViewModel.LoadAccountsAsync();
+            Console.WriteLine($"Loaded {AccountListViewModel.Accounts.Count} accounts from API.");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading accounts: {ex.Message}");
+        }
+    }
+
 
 
     private async Task LoadAccountInfo()

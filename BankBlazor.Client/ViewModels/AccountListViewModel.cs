@@ -21,8 +21,21 @@ namespace BankBlazor.Client.ViewModels
 
         public async Task LoadAccountsAsync()
         {
-            Accounts = await _httpClient.GetFromJsonAsync<List<AccountDTO>>("api/accounts") ?? new List<AccountDTO>();
+            try
+            {
+                Console.WriteLine("Fetching accounts from API...");
+                Accounts = await _httpClient.GetFromJsonAsync<List<AccountDTO>>("api/accounts") ?? new List<AccountDTO>();
+                foreach (var account in Accounts)
+                {
+                    Console.WriteLine($"AccountId: {account.AccountId}, Frequency: {account.Frequency}, Balance: {account.Balance}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching accounts: {ex.Message}");
+            }
         }
+
 
         public async Task LoadAccountDetailsAsync()
         {
