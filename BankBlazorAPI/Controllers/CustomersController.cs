@@ -22,6 +22,7 @@ namespace BankBlazorAPI.Controllers
         public async Task<ActionResult<IEnumerable<Customer>>> GetPaginatedCustomers(int page = 1, int pageSize = 10)
         {
             var customers = await _context.Customers
+                .OrderBy(c => c.CustomerId)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
@@ -30,9 +31,20 @@ namespace BankBlazorAPI.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Customer>> GetCustomerById(int id)
+        public async Task<ActionResult<CustomerDTO>> GetCustomerById(int id)
         {
-            var customer = await _context.Customers.FindAsync(id);
+            var customer = await _context.Customers
+                .Where(c => c.CustomerId == id)
+                .Select(c => new CustomerDTO
+                {
+                    CustomerId = c.CustomerId,
+                    Givenname = c.Givenname,
+                    Surname = c.Surname,
+                    Emailaddress = c.Emailaddress,
+                    Telephonenumber = c.Telephonenumber
+                })
+                .FirstOrDefaultAsync();
+
             if (customer == null)
             {
                 return NotFound();

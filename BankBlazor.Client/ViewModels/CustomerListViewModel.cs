@@ -28,9 +28,19 @@ namespace BankBlazor.Client.ViewModels
             }
         }
 
-        public async Task<CustomerDTO> GetCustomerByIdAsync(int id)
+        public async Task<CustomerDTO?> GetCustomerByIdAsync(int id)
         {
-            return await _httpClient.GetFromJsonAsync<CustomerDTO>($"api/customers/{id}");
+            try
+            {
+                var customer = await _httpClient.GetFromJsonAsync<CustomerDTO>($"api/customers/{id}");
+                Console.WriteLine($"Fetched customer: {customer?.Givenname} {customer?.Surname}");
+                return customer;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching customer: {ex.Message}");
+                return null;
+            }
         }
     }
 }

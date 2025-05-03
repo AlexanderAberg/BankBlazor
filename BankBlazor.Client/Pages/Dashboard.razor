@@ -13,29 +13,43 @@
                 @foreach (var customer in CustomerListViewModel.Customers)
                 {
                     <li>
-                        <a href="#" @onclick="() => ShowCustomerDetails(customer.CustomerId)">
+                        <button @onclick="() => ShowCustomerDetails(customer.CustomerId)">
                             @customer.Givenname @customer.Surname
-                        </a>
+                        </button>
                     </li>
                 }
             </ul>
             <button @onclick="PreviousPage" disabled="@(!CanGoToPreviousPage)">Previous</button>
             <button @onclick="NextPage" disabled="@(!CanGoToNextPage)">Next</button>
         </div>
-        @if (SelectedCustomer != null)
-        {
-            <div>
-                <h3>Customer Details</h3>
-                <p><strong>Name:</strong> @SelectedCustomer.Givenname @SelectedCustomer.Surname</p>
-                <p><strong>Email:</strong> @SelectedCustomer.Emailaddress</p>
-                <p><strong>Phone:</strong> @SelectedCustomer.Telephonenumber</p>
-            </div>
-        }
     </div>
 </section>
 
+@if (isCustomerDetailsVisible)
+{
+    <div class="custom-modal-overlay">
+        <div class="custom-modal">
+            <h3>Customer Details</h3>
+            @if (SelectedCustomer != null)
+            {
+                <p><strong>Name:</strong> @SelectedCustomer.Givenname @SelectedCustomer.Surname</p>
+                <p><strong>Email:</strong> @SelectedCustomer.Emailaddress</p>
+                <p><strong>Phone:</strong> @SelectedCustomer.Telephonenumber</p>
+                <button @onclick="CloseCustomerDetails">Close</button>
+            }
+            else
+            {
+                <p>Loading... (SelectedCustomer is null)</p>
+            }
+        </div>
+    </div>
+}
+
+
+
 @code {
     private CustomerDTO? SelectedCustomer;
+    private bool isCustomerDetailsVisible = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -44,7 +58,27 @@
 
     private async Task ShowCustomerDetails(int customerId)
     {
-        SelectedCustomer = await CustomerListViewModel.GetCustomerByIdAsync(customerId);
+        try
+        {
+            SelectedCustomer = await CustomerListViewModel.GetCustomerByIdAsync(customerId);
+            if (SelectedCustomer != null)
+            {
+                isCustomerDetailsVisible = true;
+                StateHasChanged();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching customer details: {ex.Message}");
+        }
+    }
+
+
+
+    private void CloseCustomerDetails()
+    {
+        isCustomerDetailsVisible = false;
+        SelectedCustomer = null;
     }
 
     private async Task PreviousPage()
@@ -65,4 +99,3 @@
     private bool CanGoToPreviousPage => CustomerListViewModel.CurrentPage > 1;
     private bool CanGoToNextPage => CustomerListViewModel.Customers.Count == CustomerListViewModel.PageSize;
 }
-
