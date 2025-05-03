@@ -1,21 +1,68 @@
 ﻿@page "/dashboard"
+@using BankBlazor.Client.ViewModels
+@using BankBlazor.Client.DTOs
+@inject CustomerListViewModel CustomerListViewModel
 
 <PageTitle>Dashboard</PageTitle>
 
 <section class="hero-container">
     <div class="hero-content">
-        <img src="/images/hero.jpg" class="hero-img">
-        <div class="hero-overlay">
-            <h2>Customer Dashboard</h2>
-            <div class="info">
-                <p><strong>Name:</strong> John Doe</p>
-                <p><strong>Email:</strong> johndoe@email.com</p>
-                <p><strong>Phone:</strong> +1234567890</p>
-            </div>
+        <h2>Customer Dashboard</h2>
+        <div>
+            <ul>
+                @foreach (var customer in CustomerListViewModel.Customers)
+                {
+                    <li>
+                        <a href="#" @onclick="() => ShowCustomerDetails(customer.CustomerId)">
+                            @customer.Givenname @customer.Surname
+                        </a>
+                    </li>
+                }
+            </ul>
+            <button @onclick="PreviousPage" disabled="@(!CanGoToPreviousPage)">Previous</button>
+            <button @onclick="NextPage" disabled="@(!CanGoToNextPage)">Next</button>
         </div>
+        @if (SelectedCustomer != null)
+        {
+            <div>
+                <h3>Customer Details</h3>
+                <p><strong>Name:</strong> @SelectedCustomer.Givenname @SelectedCustomer.Surname</p>
+                <p><strong>Email:</strong> @SelectedCustomer.Emailaddress</p>
+                <p><strong>Phone:</strong> @SelectedCustomer.Telephonenumber</p>
+            </div>
+        }
     </div>
 </section>
 
 @code {
+    private CustomerDTO? SelectedCustomer;
 
+    protected override async Task OnInitializedAsync()
+    {
+        await CustomerListViewModel.LoadCustomersAsync();
+    }
+
+    private async Task ShowCustomerDetails(int customerId)
+    {
+        SelectedCustomer = await CustomerListViewModel.GetCustomerByIdAsync(customerId);
+    }
+
+    private async Task PreviousPage()
+    {
+        if (CustomerListViewModel.CurrentPage > 1)
+        {
+            CustomerListViewModel.CurrentPage--;
+            await CustomerListViewModel.LoadCustomersAsync();
+        }
+    }
+
+    private async Task NextPage()
+    {
+        CustomerListViewModel.CurrentPage++;
+        await CustomerListViewModel.LoadCustomersAsync();
+    }
+
+    private bool CanGoToPreviousPage => CustomerListViewModel.CurrentPage > 1;
+    private bool CanGoToNextPage => CustomerListViewModel.Customers.Count == CustomerListViewModel.PageSize;
 }
+

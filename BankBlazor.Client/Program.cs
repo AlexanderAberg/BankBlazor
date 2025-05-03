@@ -16,6 +16,7 @@ public class Program
         
         builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:7068") });
         builder.Services.AddScoped<AccountListViewModel>();
+        builder.Services.AddScoped<CustomerListViewModel>();
 
         await builder.Build().RunAsync();
 
