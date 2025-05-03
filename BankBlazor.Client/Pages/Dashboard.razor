@@ -52,9 +52,20 @@
             <h3>Customer Details</h3>
             @if (SelectedCustomer != null)
             {
+				<p><strong>Customer ID:</strong> @SelectedCustomer.CustomerId</p>
                 <p><strong>Name:</strong> @SelectedCustomer.Givenname @SelectedCustomer.Surname</p>
                 <p><strong>Email:</strong> @SelectedCustomer.Emailaddress</p>
-                <p><strong>Phone:</strong> @SelectedCustomer.Telephonenumber</p>
+                <p>
+                    <strong>Phone:</strong>
+                    @(string.IsNullOrWhiteSpace(SelectedCustomer.Telephonecountrycode)
+                        ? string.Empty
+                        : $"({SelectedCustomer.Telephonecountrycode})")
+                    @SelectedCustomer.Telephonenumber
+                </p>
+				<p><strong>Address:</strong> @SelectedCustomer.Streetaddress @SelectedCustomer.Zipcode @SelectedCustomer.City @SelectedCustomer.Country @SelectedCustomer.CountryCode</p>
+                <p><strong>Birthday:</strong>  @SelectedCustomer.Birthday</p>
+                <p><strong>Gender:</strong> @SelectedCustomer.Gender</p>
+                <p><strong>National Id:</strong> @SelectedCustomer.NationalId</p>
                 <button @onclick="CloseCustomerDetails">Close</button>
             }
             else

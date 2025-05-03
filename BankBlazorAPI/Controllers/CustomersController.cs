@@ -30,10 +30,20 @@ namespace BankBlazorAPI.Controllers
                 .Select(c => new CustomerDTO
                 {
                     CustomerId = c.CustomerId,
+                    Gender = c.Gender,
                     Givenname = c.Givenname,
                     Surname = c.Surname,
-                    Emailaddress = c.Emailaddress,
-                    Telephonenumber = c.Telephonenumber
+                    Streetaddress = c.Streetaddress,
+                    City = c.City,
+                    Zipcode = c.Zipcode,
+                    Country = c.Country,
+                    CountryCode = c.CountryCode,
+                    Birthday = c.Birthday,
+                    NationalId = c.NationalId,
+                    Telephonecountrycode = c.Telephonecountrycode,
+                    Telephonenumber = c.Telephonenumber,
+                    Emailaddress = c.Emailaddress
+
                 })
                 .ToListAsync();
 
@@ -53,10 +63,19 @@ namespace BankBlazorAPI.Controllers
                 .Select(c => new CustomerDTO
                 {
                     CustomerId = c.CustomerId,
+                    Gender = c.Gender,
                     Givenname = c.Givenname,
                     Surname = c.Surname,
-                    Emailaddress = c.Emailaddress,
-                    Telephonenumber = c.Telephonenumber
+                    Streetaddress = c.Streetaddress,
+                    City = c.City,
+                    Zipcode = c.Zipcode,
+                    Country = c.Country,
+                    CountryCode = c.CountryCode,
+                    Birthday = c.Birthday,
+                    NationalId = c.NationalId,
+                    Telephonecountrycode = c.Telephonecountrycode,
+                    Telephonenumber = c.Telephonenumber,
+                    Emailaddress = c.Emailaddress
                 })
                 .FirstOrDefaultAsync();
 
