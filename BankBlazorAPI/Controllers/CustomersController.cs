@@ -10,20 +10,13 @@ namespace BankBlazorAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class CustomersController : ControllerBase
+    public class CustomersController(BankAppDataContext context) : ControllerBase
     {
-        private readonly BankAppDataContext _context;
-
-        public CustomersController(BankAppDataContext context)
-        {
-            _context = context;
-        }
-
         [HttpGet("paginated")]
         public async Task<ActionResult<PaginatedResponse<CustomerDTO>>> GetPaginatedCustomers(int page = 1, int pageSize = 12)
         {
-            var totalCount = await _context.Customers.CountAsync();
-            var customers = await _context.Customers
+            var totalCount = await context.Customers.CountAsync();
+            var customers = await context.Customers
                 .OrderBy(c => c.CustomerId)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
@@ -58,7 +51,7 @@ namespace BankBlazorAPI.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<CustomerDTO>> GetCustomerById(int id)
         {
-            var customer = await _context.Customers
+            var customer = await context.Customers
                 .Where(c => c.CustomerId == id)
                 .Select(c => new CustomerDTO
                 {

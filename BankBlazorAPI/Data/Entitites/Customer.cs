@@ -33,5 +33,5 @@ public partial class Customer
 
     public string? Emailaddress { get; set; }
 
-    public virtual ICollection<Disposition> Dispositions { get; set; } = new List<Disposition>();
+    public virtual ICollection<Disposition> Dispositions { get; set; } = [];
 }

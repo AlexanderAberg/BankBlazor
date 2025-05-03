@@ -6,16 +6,11 @@ using BankBlazor.Client.DTOs;
 
 namespace BankBlazor.Client.ViewModels
 {
-    public class AccountListViewModel
+    public class AccountListViewModel(HttpClient httpClient)
     {
-        private readonly HttpClient _httpClient;
+        private readonly HttpClient _httpClient = httpClient;
 
-        public AccountListViewModel(HttpClient httpClient)
-        {
-            _httpClient = httpClient;
-        }
-
-        public List<AccountDTO> Accounts { get; set; } = new();
+        public List<AccountDTO> Accounts { get; set; } = [];
         public AccountDTO? CurrentAccount { get; set; }
         public int SelectedAccountId { get; set; }
 
@@ -24,7 +19,7 @@ namespace BankBlazor.Client.ViewModels
             try
             {
                 Console.WriteLine("Fetching accounts from API...");
-                Accounts = await _httpClient.GetFromJsonAsync<List<AccountDTO>>("api/accounts") ?? new List<AccountDTO>();
+                Accounts = await _httpClient.GetFromJsonAsync<List<AccountDTO>>("api/accounts") ?? [];
                 foreach (var account in Accounts)
                 {
                     Console.WriteLine($"AccountId: {account.AccountId}, Frequency: {account.Frequency}, Balance: {account.Balance}");

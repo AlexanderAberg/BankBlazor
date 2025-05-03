@@ -8,19 +8,12 @@ namespace BankBlazorAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class AccountsController : ControllerBase
+    public class AccountsController(BankAppDataContext context) : ControllerBase
     {
-        private readonly BankAppDataContext _context;
-
-        public AccountsController(BankAppDataContext context)
-        {
-            _context = context;
-        }
-
         [HttpGet]
         public async Task<ActionResult<IEnumerable<AccountDTO>>> GetAccounts()
         {
-            var accounts = await _context.Accounts
+            var accounts = await context.Accounts
                 .Select(a => new AccountDTO
                 {
                     AccountId = a.AccountId,
@@ -35,7 +28,7 @@ namespace BankBlazorAPI.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<AccountDTO>> GetAccount(int id)
         {
-            var account = await _context.Accounts
+            var account = await context.Accounts
                 .Where(a => a.AccountId == id)
                 .Select(a => new AccountDTO
                 {
@@ -56,7 +49,7 @@ namespace BankBlazorAPI.Controllers
         [HttpPost("deposit")]
         public async Task<IActionResult> Deposit([FromBody] TransactionDTO request)
         {
-            var account = await _context.Accounts.FindAsync(request.AccountId);
+            var account = await context.Accounts.FindAsync(request.AccountId);
             if (account == null)
             {
                 return NotFound("Account not found.");
@@ -64,7 +57,7 @@ namespace BankBlazorAPI.Controllers
 
             account.Balance += request.Amount;
 
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
 
             return Ok("Deposit successful.");
         }
@@ -72,7 +65,7 @@ namespace BankBlazorAPI.Controllers
         [HttpPost("withdraw")]
         public async Task<IActionResult> Withdraw([FromBody] TransactionDTO request)
         {
-            var account = await _context.Accounts.FindAsync(request.AccountId);
+            var account = await context.Accounts.FindAsync(request.AccountId);
             if (account == null)
             {
                 return NotFound("Account not found.");
@@ -82,7 +75,7 @@ namespace BankBlazorAPI.Controllers
                 return BadRequest("Insufficient funds.");
             }
             account.Balance -= request.Amount;
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
             return Ok("Withdrawal successful.");
         }
 
@@ -91,13 +84,13 @@ namespace BankBlazorAPI.Controllers
         {
             Console.WriteLine($"Transfer request received: SourceAccountId={transferRequest.AccountId}, Amount={transferRequest.Amount}, RecipientAccountNumber={transferRequest.RecipientAccountNumber}");
 
-            var sourceAccount = await _context.Accounts.FindAsync(transferRequest.AccountId);
+            var sourceAccount = await context.Accounts.FindAsync(transferRequest.AccountId);
             if (sourceAccount == null)
             {
                 return NotFound("Source account not found.");
             }
 
-            var recipientAccount = await _context.Accounts
+            var recipientAccount = await context.Accounts
                 .FirstOrDefaultAsync(a => a.AccountId.ToString() == transferRequest.RecipientAccountNumber);
             if (recipientAccount == null)
             {
@@ -112,7 +105,7 @@ namespace BankBlazorAPI.Controllers
             sourceAccount.Balance -= transferRequest.Amount;
             recipientAccount.Balance += transferRequest.Amount;
 
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
 
             return Ok("Transfer successful.");
         }
