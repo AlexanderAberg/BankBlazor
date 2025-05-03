@@ -18,16 +18,13 @@ namespace BankBlazor.Client.ViewModels
         {
             try
             {
-                Console.WriteLine("Fetching accounts from API...");
                 Accounts = await _httpClient.GetFromJsonAsync<List<AccountDTO>>("api/accounts") ?? [];
                 foreach (var account in Accounts)
                 {
-                    Console.WriteLine($"AccountId: {account.AccountId}, Frequency: {account.Frequency}, Balance: {account.Balance}");
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine($"Error fetching accounts: {ex.Message}");
             }
         }
 
@@ -44,17 +41,11 @@ namespace BankBlazor.Client.ViewModels
                 var response = await _httpClient.PostAsJsonAsync("api/accounts/deposit", new { AccountId = SelectedAccountId, Amount = amount });
                 if (response.IsSuccessStatusCode)
                 {
-                    Console.WriteLine("Deposit successful.");
                     await LoadAccountDetailsAsync(); 
                 }
-                else
-                {
-                    Console.WriteLine($"Deposit failed: {response.ReasonPhrase}");
-                }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine($"Error during deposit: {ex.Message}");
             }
         }
 
@@ -66,17 +57,11 @@ namespace BankBlazor.Client.ViewModels
                 var response = await _httpClient.PostAsJsonAsync("api/accounts/withdraw", new { AccountId = SelectedAccountId, Amount = amount });
                 if (response.IsSuccessStatusCode)
                 {
-                    Console.WriteLine("Withdrawal successful.");
                     await LoadAccountDetailsAsync();
                 }
-                else
-                {
-                    Console.WriteLine($"Withdrawal failed: {response.ReasonPhrase}");
-                }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine($"Error during withdrawal: {ex.Message}");
             }
         }
 
@@ -93,17 +78,11 @@ namespace BankBlazor.Client.ViewModels
 
                 if (response.IsSuccessStatusCode)
                 {
-                    Console.WriteLine("Transfer successful.");
                     await LoadAccountDetailsAsync(); 
                 }
-                else
-                {
-                    Console.WriteLine($"Transfer failed: {response.ReasonPhrase}");
-                }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine($"Error during transfer: {ex.Message}");
             }
         }
     }

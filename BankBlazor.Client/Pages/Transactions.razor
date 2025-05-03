@@ -94,9 +94,8 @@
                 await LoadAccountInfo();
             }
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            Console.WriteLine($"Error initializing transactions: {ex.Message}");
         }
     }
 
@@ -108,9 +107,8 @@
             await AccountListViewModel.LoadAccountsAsync();
             Console.WriteLine($"Loaded {AccountListViewModel.Accounts.Count} accounts from API.");
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            Console.WriteLine($"Error loading accounts: {ex.Message}");
         }
     }
 
@@ -122,9 +120,8 @@
         {
             await AccountListViewModel.LoadAccountDetailsAsync();
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            Console.WriteLine($"Error loading account info: {ex.Message}");
         }
     }
 
@@ -184,19 +181,15 @@
             {
                 if (string.IsNullOrWhiteSpace(transferRecipient))
                 {
-                    Console.WriteLine("Transfer recipient is required.");
                     return;
                 }
 
                 await AccountListViewModel.TransferAsync(transactionAmount, transferRecipient);
             }
-
-            Console.WriteLine($"{confirmationTitle}: ${transactionAmount}");
             ResetInputs();
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            Console.WriteLine($"Error processing transaction: {ex.Message}");
         }
     }
 

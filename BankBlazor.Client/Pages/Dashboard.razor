@@ -97,14 +97,9 @@
                 isCustomerDetailsVisible = true;
                 StateHasChanged();
             }
-            else
-            {
-                Console.WriteLine("Customer not found.");
-            }
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            Console.WriteLine($"Error fetching customer details: {ex.Message}");
         }
     }
 
@@ -140,10 +135,6 @@
             CustomerListViewModel.CurrentPage = pageNumber;
             await CustomerListViewModel.LoadCustomersAsync();
         }
-        else
-        {
-            Console.WriteLine("Invalid page number.");
-        }
     }
 
 
@@ -155,14 +146,7 @@
         {
             await GoToPage(PageInput);
         }
-        else
-        {
-            Console.WriteLine("Invalid page number.");
-        }
     }
-
-
-
 
     private bool CanGoToPreviousPage => CustomerListViewModel.CurrentPage > 1;
     private bool CanGoToNextPage => CustomerListViewModel.CurrentPage < CustomerListViewModel.TotalPages;
