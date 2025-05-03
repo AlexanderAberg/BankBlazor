@@ -6,9 +6,11 @@
 
 <section class="hero-container">
     <div class="hero-content">
+		<!-- Hero image and overlay -->
         <img src="/images/hero.jpg" class="hero-img">
         <div class="hero-overlay">
             <h2>Account Transactions</h2>
+			<!-- Account selection dropdown -->
             <div class="account-selection">
                 <label for="accountSelect">Select Account:</label>
                 <select id="accountSelect" @bind="AccountListViewModel.SelectedAccountId" @bind:after="LoadAccountInfo">
@@ -19,6 +21,7 @@
                 </select>
 
             </div>
+			<!-- Account information and action buttons -->
             <div class="info">
                 <p><strong>Account Number:</strong> @AccountListViewModel.CurrentAccount?.AccountId</p>
                 <p><strong>Balance:</strong> @AccountListViewModel.CurrentAccount?.Balance.ToString("C")</p>
@@ -31,6 +34,7 @@
 
             @if (isDepositInputVisible)
             {
+				// Show deposit input
                 <div class="transaction-input">
                     <input type="number" @bind="transactionAmount" placeholder="Enter amount to deposit" />
                     <button @onclick="ConfirmDeposit">Submit</button>
@@ -40,6 +44,7 @@
 
             @if (isWithdrawInputVisible)
             {
+				// Show withdraw input
                 <div class="transaction-input">
                     <input type="number" @bind="transactionAmount" placeholder="Enter amount to withdraw" />
                     <button @onclick="ConfirmWithdraw">Submit</button>
@@ -49,6 +54,7 @@
 
             @if (isTransferInputVisible)
             {
+				// Show transfer input
                 <div class="transaction-input">
                     <input type="number" @bind="transactionAmount" placeholder="Enter amount to transfer" />
                     <input type="text" @bind="transferRecipient" placeholder="Enter recipient account number" />
@@ -59,6 +65,7 @@
 
             @if (isConfirmationVisible)
             {
+				// Show confirmation modal
                 <div class="custom-modal-overlay">
                     <div class="custom-modal">
                         <h3>@confirmationTitle</h3>

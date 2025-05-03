@@ -7,6 +7,7 @@
 
 <section class="hero-container">
     <div class="hero-content">
+		<!-- Hero image and overlay -->
         <img src="/images/hero.jpg" class="hero-img">
         <div class="hero-overlay">
         <h2>Customer Dashboard</h2>
@@ -21,6 +22,7 @@
                 }
             </div>
             <div class="pagination">
+				<!-- Pagination controls -->
                 <button @onclick="PreviousPage" disabled="@(!CanGoToPreviousPage)">Previous</button>
 
                 @for (int i = Math.Max(1, CustomerListViewModel.CurrentPage - 2); i <= Math.Min(CustomerListViewModel.TotalPages, CustomerListViewModel.CurrentPage + 2); i++)
@@ -31,22 +33,18 @@
                     </button>
                 }
 
-
-
                 <button @onclick="NextPage" disabled="@(!CanGoToNextPage)">Next</button>
 
                 <input type="number" min="1" max="@CustomerListViewModel.TotalPages" @bind="PageInput" @bind:event="oninput" class="page-input" />
                 <button @onclick="GoToPageInput">Go</button>
             </div>
-
-
-
         </div>
     </div>
 </section>
 
 @if (isCustomerDetailsVisible)
 {
+	<!-- Modal for customer details -->
     <div class="custom-modal-overlay">
         <div class="custom-modal">
             <h3>Customer Details</h3>

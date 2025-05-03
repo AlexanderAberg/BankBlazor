@@ -8,6 +8,7 @@ var connectionString = builder.Configuration.GetConnectionString("BankAppData");
 builder.Services.AddDbContext<BankAppDataContext>(options =>
     options.UseSqlServer(connectionString));
 
+// Add services to the container.
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
@@ -30,6 +31,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+// Configure the HTTP request pipeline.
 app.UseCors();
 
 app.UseHttpsRedirection();
