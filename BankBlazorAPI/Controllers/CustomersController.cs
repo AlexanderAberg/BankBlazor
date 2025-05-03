@@ -3,6 +3,7 @@ using BankBlazorAPI.Data.Entitites;
 using BankBlazor.Api.Data.Contexts;
 using BankBlazorAPI.DTOs;
 using Microsoft.EntityFrameworkCore;
+using BankBlazor.Client.ViewModels;
 
 namespace BankBlazorAPI.Controllers
 
@@ -19,16 +20,30 @@ namespace BankBlazorAPI.Controllers
         }
 
         [HttpGet("paginated")]
-        public async Task<ActionResult<IEnumerable<Customer>>> GetPaginatedCustomers(int page = 1, int pageSize = 10)
+        public async Task<ActionResult<PaginatedResponse<CustomerDTO>>> GetPaginatedCustomers(int page = 1, int pageSize = 12)
         {
+            var totalCount = await _context.Customers.CountAsync();
             var customers = await _context.Customers
                 .OrderBy(c => c.CustomerId)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
+                .Select(c => new CustomerDTO
+                {
+                    CustomerId = c.CustomerId,
+                    Givenname = c.Givenname,
+                    Surname = c.Surname,
+                    Emailaddress = c.Emailaddress,
+                    Telephonenumber = c.Telephonenumber
+                })
                 .ToListAsync();
 
-            return Ok(customers);
+            return Ok(new PaginatedResponse<CustomerDTO>
+            {
+                Items = customers,
+                TotalCount = totalCount
+            });
         }
+
 
         [HttpGet("{id}")]
         public async Task<ActionResult<CustomerDTO>> GetCustomerById(int id)

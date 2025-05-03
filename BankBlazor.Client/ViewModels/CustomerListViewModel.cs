@@ -10,37 +10,54 @@ namespace BankBlazor.Client.ViewModels
     {
         private readonly HttpClient _httpClient;
 
+        public List<CustomerDTO> Customers { get; private set; } = new();
+        public int CurrentPage { get; set; } = 1;
+        public int TotalPages { get; private set; }
+        public int PageSize { get; private set; } = 12;
+
+
+
         public CustomerListViewModel(HttpClient httpClient)
         {
             _httpClient = httpClient;
         }
 
-        public List<CustomerDTO> Customers { get; set; } = new();
-        public int CurrentPage { get; set; } = 1;
-        public int PageSize { get; set; } = 10;
-
         public async Task LoadCustomersAsync()
-        {
-            var response = await _httpClient.GetFromJsonAsync<List<CustomerDTO>>($"api/customers/paginated?page={CurrentPage}&pageSize={PageSize}");
-            if (response != null)
-            {
-                Customers = response;
-            }
-        }
-
-        public async Task<CustomerDTO?> GetCustomerByIdAsync(int id)
         {
             try
             {
-                var customer = await _httpClient.GetFromJsonAsync<CustomerDTO>($"api/customers/{id}");
-                Console.WriteLine($"Fetched customer: {customer?.Givenname} {customer?.Surname}");
-                return customer;
+                Console.WriteLine($"Fetching customers for page {CurrentPage} with page size {PageSize}...");
+                var response = await _httpClient.GetFromJsonAsync<PaginatedResponse<CustomerDTO>>($"api/customers/paginated?page={CurrentPage}&pageSize={PageSize}");
+                if (response != null)
+                {
+                    Customers = response.Items;
+                    TotalPages = (int)Math.Ceiling((double)response.TotalCount / PageSize);
+                    Console.WriteLine($"Loaded {Customers.Count} customers. Total pages: {TotalPages}");
+                }
+                else
+                {
+                    Console.WriteLine("No response from API.");
+                }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error fetching customer: {ex.Message}");
-                return null;
+                Console.WriteLine($"Error loading customers: {ex.Message}");
             }
         }
+
+
+
+        public async Task<CustomerDTO?> GetCustomerByIdAsync(int customerId)
+        {
+            return await _httpClient.GetFromJsonAsync<CustomerDTO>($"api/customers/{customerId}");
+        }
+    }
+
+    public class PaginatedResponse<T>
+    {
+        public List<T> Items { get; set; } = new();
+        public int TotalPages { get; set; }
+        public int TotalCount { get; set; }
     }
 }
+

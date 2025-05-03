@@ -7,20 +7,40 @@
 
 <section class="hero-container">
     <div class="hero-content">
+        <img src="/images/hero.jpg" class="hero-img">
+        <div class="hero-overlay">
         <h2>Customer Dashboard</h2>
         <div>
-            <ul>
                 @foreach (var customer in CustomerListViewModel.Customers)
                 {
-                    <li>
+                    <ul>
                         <button @onclick="() => ShowCustomerDetails(customer.CustomerId)">
                             @customer.Givenname @customer.Surname
                         </button>
-                    </li>
+                    </ul>
                 }
-            </ul>
-            <button @onclick="PreviousPage" disabled="@(!CanGoToPreviousPage)">Previous</button>
-            <button @onclick="NextPage" disabled="@(!CanGoToNextPage)">Next</button>
+            </div>
+            <div class="pagination">
+                <button @onclick="PreviousPage" disabled="@(!CanGoToPreviousPage)">Previous</button>
+
+                @for (int i = Math.Max(1, CustomerListViewModel.CurrentPage - 2); i <= Math.Min(CustomerListViewModel.TotalPages, CustomerListViewModel.CurrentPage + 2); i++)
+                {
+                    var pageNumber = i;
+                    <button class="page-button @(CustomerListViewModel.CurrentPage == pageNumber ? "active" : "")" @onclick="() => GoToPage(pageNumber)">
+                        @pageNumber
+                    </button>
+                }
+
+
+
+                <button @onclick="NextPage" disabled="@(!CanGoToNextPage)">Next</button>
+
+                <input type="number" min="1" max="@CustomerListViewModel.TotalPages" @bind="PageInput" @bind:event="oninput" class="page-input" />
+                <button @onclick="GoToPageInput">Go</button>
+            </div>
+
+
+
         </div>
     </div>
 </section>
@@ -66,13 +86,16 @@
                 isCustomerDetailsVisible = true;
                 StateHasChanged();
             }
+            else
+            {
+                Console.WriteLine("Customer not found.");
+            }
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error fetching customer details: {ex.Message}");
         }
     }
-
 
 
     private void CloseCustomerDetails()
@@ -92,10 +115,44 @@
 
     private async Task NextPage()
     {
-        CustomerListViewModel.CurrentPage++;
-        await CustomerListViewModel.LoadCustomersAsync();
+        if (CustomerListViewModel.CurrentPage < CustomerListViewModel.TotalPages)
+        {
+            CustomerListViewModel.CurrentPage++;
+            await CustomerListViewModel.LoadCustomersAsync();
+        }
     }
 
+    private async Task GoToPage(int pageNumber)
+    {
+        if (pageNumber >= 1 && pageNumber <= CustomerListViewModel.TotalPages)
+        {
+            CustomerListViewModel.CurrentPage = pageNumber;
+            await CustomerListViewModel.LoadCustomersAsync();
+        }
+        else
+        {
+            Console.WriteLine("Invalid page number.");
+        }
+    }
+
+
+    private int PageInput;
+
+    private async Task GoToPageInput()
+    {
+        if (PageInput >= 1 && PageInput <= CustomerListViewModel.TotalPages)
+        {
+            await GoToPage(PageInput);
+        }
+        else
+        {
+            Console.WriteLine("Invalid page number.");
+        }
+    }
+
+
+
+
     private bool CanGoToPreviousPage => CustomerListViewModel.CurrentPage > 1;
-    private bool CanGoToNextPage => CustomerListViewModel.Customers.Count == CustomerListViewModel.PageSize;
+    private bool CanGoToNextPage => CustomerListViewModel.CurrentPage < CustomerListViewModel.TotalPages;
 }
